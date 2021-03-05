@@ -56,6 +56,8 @@ public class User implements UserDetails {
 	
 	@ElementCollection
 	Map<Product, Integer> cart;
+	
+	
 
 	
 
