@@ -18,7 +18,7 @@
                     </div>
                     <h5 class="card-text" th:text="${#numbers.formatCurrency(product.price)}"></h5>
                     <p class="card-text" th:text="${product.description}"></p>
-                    <form th:action="@{/cart}" th:object="${product}" method="post">
+                    <form th:action="@{/cart/add}" th:object="${product}" method="post">
                         <input type="hidden" th:field="*{id}" />
                         <button type="submit" class="btn btn-primary">Add to Cart</button>
                     </form>

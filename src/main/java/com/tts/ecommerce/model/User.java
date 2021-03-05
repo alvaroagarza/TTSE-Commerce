@@ -51,7 +51,8 @@ public class User implements UserDetails {
 	@Pattern(regexp="[^\\s]+", message="Your username cannot contain spaces")
 	String username;
 	
-	@Length(min = 5, message = "Your password must have at least 5 characters")
+	@Length(min = 8, message = "Your password must have at least 5 characters")
+	@Pattern(regexp="[^\\s]+", message="Your username cannot contain spaces")
 	String password;
 	
 	@ElementCollection

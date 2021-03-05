@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.tts.ecommerce.model.ChargeRequest;
 import com.tts.ecommerce.model.Product;
 import com.tts.ecommerce.model.User;
 import com.tts.ecommerce.service.ProductService;
@@ -48,24 +51,29 @@ public class CartController {
 		return new ArrayList<>();
 }
 	
+	@Value("${STRIPE_PUBLIC_KEY}")
+    private String stripePublicKey;
 	
 	@GetMapping("/cart")
-	public String showCart() {
+	public String showCart(Model model) {
+        model.addAttribute("amount", 50 * 100); // in cents
+        model.addAttribute("stripePublicKey", stripePublicKey);
+        model.addAttribute("currency", ChargeRequest.Currency.EUR);
 		return "cart";
 	}
 	
-	@PostMapping("/cart")
+	@PostMapping("/cart/add")
 	public String addToCart(@RequestParam long id) {
-		System.out.println("Here?");
 		Product p = productService.findById(id);
 		setQuantity(p, cart().getOrDefault(p, 0) + 1);
 		return "cart";
 	}
 	
-	@PatchMapping("/cart")
+	@PostMapping("/cart")
 	public String updateQuantities(@RequestParam long[] id, @RequestParam int[] quantity ) {
+		System.out.println(id.toString()+ " " + quantity.toString());
 		for(int i = 0; i < id.length; i++) {
-			Product p = productService.findById(i);
+			Product p = productService.findById(id[i]);
 			setQuantity(p, quantity[i]);
 		}
 		return "cart";
@@ -74,22 +82,20 @@ public class CartController {
 	@PostMapping("/cart/delete")
 	public String removeFromCart(@RequestParam long id) {
 		Product p = productService.findById(id);
-		System.out.println("Test");
 		setQuantity(p, 0);
 		return "cart";
 	}
 	
 	private void setQuantity(Product p, int quantity) {
-			System.out.println(quantity);
+		Map<Product, Integer> newCart = cart();
 		if(quantity > 0) {
-			cart().put(p, quantity);
-			System.out.println("I shouldn't");
+			newCart.put(p, quantity);
 		}
 		else {
-			cart().remove(p);
+			newCart.remove(p);
 		}
 		
-		userService.updateCart(cart());
+		userService.updateCart(newCart);
 	}
 	
 	
