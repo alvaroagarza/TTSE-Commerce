@@ -1,4 +1,4 @@
-package com.tts.ecommerce.controllers;
+ package com.tts.ecommerce.controllers;
 
 import java.util.List;
 
@@ -38,10 +38,11 @@ public class MainController {
 		return productService.findAll();
 	}
 
+	 @ModelAttribute("categories")
 	public List<String> categories(String category) {
 		return productService.findDistinctCategories(category);
 	}
-	
+	@ModelAttribute("brands")
 	public List<String> brands(String brand) {
 		return productService.findDistinctBrands(brand);
 	}
